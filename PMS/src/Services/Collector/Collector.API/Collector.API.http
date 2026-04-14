@@ -1,0 +1,6 @@
+@Collector.API_HostAddress = http://localhost:5039
+
+GET {{Collector.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
