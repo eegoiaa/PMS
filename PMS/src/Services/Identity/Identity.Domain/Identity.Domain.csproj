@@ -5,7 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	
+  <ItemGroup>
+	<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.24" />
+  </ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PMS.Shared.Common\PMS.Shared.Common.csproj" />
   </ItemGroup>
