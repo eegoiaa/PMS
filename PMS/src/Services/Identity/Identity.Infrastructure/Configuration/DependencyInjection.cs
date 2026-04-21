@@ -10,9 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PMS.Shared.Common.Events;
 using PMS.Shared.Common.Extensions;
 using System.Reflection;
 using Wolverine;
+using Wolverine.RabbitMQ;
 
 namespace Identity.Infrastructure.Configuration;
 
@@ -90,6 +92,16 @@ public static class DependencyInjection
         return host.UseWolverine(options =>
         {
             options.Discovery.IncludeAssembly(assembly);
+
+            var rabbitUri = configuration.GetConnectionString("RabbitMq")
+                            ?? throw new InvalidOperationException("RabbitMq connection string is missing!");
+
+            options.UseRabbitMq(new Uri(rabbitUri)).AutoProvision();
+
+            options.PublishMessage<UserRegisteredEvent>()
+                   .ToRabbitQueue("core-events-queue"); 
+
+            options.Policies.AutoApplyTransactions();
         });
     }
 }

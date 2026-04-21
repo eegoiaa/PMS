@@ -1,13 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>3125c10c-36c0-4d47-833a-25ad87ccf0bb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.24">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	  <PackageReference Include="WolverineFx.Http" Version="3.13.5" />
+	  <PackageReference Include="WolverineFx.RabbitMQ" Version="3.13.5" />
   </ItemGroup>
 
   <ItemGroup>

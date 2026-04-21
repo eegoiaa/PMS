@@ -5,6 +5,9 @@ using Identity.Domain.Exceptions;
 using Identity.Domain.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using PMS.Shared.Common.Events;
+using System.Globalization;
+using Wolverine;
 
 namespace Identity.Application.Commands.SignUp;
 
@@ -15,6 +18,7 @@ public static class SignUpHandler
     UserManager<AppUser> userManager,
     IEmailService emailService,
     IOptions<AuthOptions> options,
+    IMessageBus bus,
     CancellationToken cancellationToken
     )
     {
@@ -22,7 +26,7 @@ public static class SignUpHandler
         {
             UserName = command.Email,
             Email = command.Email,
-            FullName = command.Email,
+            FullName = command.FullName
         };
 
         var result = await userManager.CreateAsync(user, command.Password);
@@ -41,5 +45,12 @@ public static class SignUpHandler
         var confirmationLink = $"{settings.FrontendConfirmationUrl}?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
         await emailService.SendConfirmationLinkAsync(user.Email, confirmationLink, cancellationToken);
+
+        await bus.PublishAsync(new UserRegisteredEvent(
+            user.Id,
+            user.FullName,
+            RolesConstants.Developer
+        ));
+            
     }
 }

@@ -6,9 +6,27 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.24" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.24">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.24">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="WolverineFx.RabbitMQ" Version="3.13.5" />
+		<PackageReference Include="WolverineFx" Version="3.13.5" />
+		<PackageReference Include="WolverineFx.FluentValidation" Version="3.13.5" />
+	</ItemGroup>	
+	
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PMS.Shared.Common\PMS.Shared.Common.csproj" />
     <ProjectReference Include="..\..\Identity\Identity.Application\Identity.Application.csproj" />
+    <ProjectReference Include="..\Core.Application\Core.Application.csproj" />
+    <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
   </ItemGroup>
 
 </Project>
