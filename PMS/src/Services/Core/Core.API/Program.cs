@@ -1,5 +1,6 @@
 using Core.Application.Commands.CreateTask;
 using Core.Infrastructure.Configuration;
+using PMS.Shared.Common.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
