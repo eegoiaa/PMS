@@ -8,7 +8,7 @@ public class ActivityCleaner : IActivityCleaner
 {
     private static readonly Regex TaskKeyRegex = new Regex(
         @"[A-Z]+-\d+",
-        RegexOptions.Compiled);
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public Task<string?> ExtractTaskIdAsync(RawActivityLog rawLog, CancellationToken cancellationToken)
     {
