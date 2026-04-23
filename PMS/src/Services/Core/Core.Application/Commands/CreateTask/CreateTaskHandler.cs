@@ -18,6 +18,7 @@ public static class CreateTaskHandler
         var task = new ProjectTask
         {
             Id = Guid.NewGuid(),
+            TaskKey = command.TaskKey.ToUpper(),
             Title = command.Title,
             DeveloperId = command.DeveloperId,
             PlanHours = command.PlanHours,

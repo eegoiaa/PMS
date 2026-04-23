@@ -5,6 +5,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.24" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.24">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.24">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="WolverineFx.RabbitMQ" Version="3.13.5" />
+		<PackageReference Include="WolverineFx" Version="3.13.5" />
+		<PackageReference Include="WolverineFx.FluentValidation" Version="3.13.5" />
+		<PackageReference Include="Octokit" Version="14.0.0" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+		<PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\PMS.Shared.Common\PMS.Shared.Common.csproj" />
