@@ -1,4 +1,6 @@
-﻿using Core.Application.Commands.CreateTask;
+﻿using Core.Application.Commands.CompleteTask;
+using Core.Application.Commands.CreateTask;
+using Core.Application.Commands.UpdateTaskPlan;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 
@@ -19,6 +21,21 @@ public class TasksController : ControllerBase
     public async Task<IActionResult> CreateTask([FromBody] CreateTaskCommand command)
     {
         var taskId = await _messageBus.InvokeAsync<Guid>(command);
-        return Ok(new { TaskId = taskId, Message = "Задача успешно создана" });
+        return Ok(new { TaskId = taskId, Message = "Task create ssuccesfully" });
+    }
+
+    [HttpPost("{taskId:guid}/complete")]
+    public async Task<IActionResult> CompleteTask(Guid taskId)
+    {
+        await _messageBus.InvokeAsync(new CompleteTaskCommand(taskId));
+        return Ok(new { Message = "Task completed successfully. Developer volatility recalculated." });
+    }
+
+    [HttpPut("{taskId:guid}/plan")]
+    public async Task<IActionResult> UpdateTaskPlan(Guid taskId, [FromBody] UpdateTaskPlanRequest request)
+    {
+        await _messageBus.InvokeAsync(new UpdateTaskPlanCommand(taskId, request.NewPlanHours));
+
+        return Ok(new { Message = "Task plan updated successfully." });
     }
 }

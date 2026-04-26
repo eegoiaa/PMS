@@ -13,8 +13,9 @@ public static class VolatilityCalculator
         if (task.PlanHours <= 0)
             return 0;
 
-        // Если отклонение > 0.3 (30%), система должна бить тревогу (Scope Creep)
-        return (task.FactHours - task.PlanHours) / task.PlanHours;
+        var volatility = (task.FactHours - task.PlanHours) / task.PlanHours;
+
+        return Math.Round(volatility, 2);
     }
 
     /// <summary>
@@ -30,6 +31,6 @@ public static class VolatilityCalculator
             totalLoad += task.PlanHours * (1 + averageVolatility);
         }
 
-        return totalLoad;
+        return Math.Round(totalLoad, 2);
     }
 }
