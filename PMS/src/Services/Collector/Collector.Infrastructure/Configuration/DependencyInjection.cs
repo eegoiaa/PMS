@@ -67,7 +67,7 @@ public static class DependencyInjection
             options.UseRabbitMq(new Uri(rabbitUri)).AutoProvision();
 
             options.PublishMessage<ActivityLoggedEvent>()
-                   .ToRabbitQueue("core-events-queue");
+                   .ToRabbitExchange("core-events-exchange");
         });
     }
 }

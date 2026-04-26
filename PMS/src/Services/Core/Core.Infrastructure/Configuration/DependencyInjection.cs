@@ -31,14 +31,18 @@ public static class DependencyInjection
     {
         return host.UseWolverine(options =>
         {
+            options.Discovery.IncludeAssembly(assembly);
             var rabbitUri = configuration.GetConnectionString("RabbitMq")
-                            ?? throw new InvalidOperationException("RabbitMq connection string is missing!");
-
+                    ?? throw new InvalidOperationException("RabbitMq connection string is missing!"); ;
             options.UseRabbitMq(new Uri(rabbitUri)).AutoProvision();
+
+            options.UseRabbitMq(new Uri(rabbitUri))
+                   .AutoProvision()
+                   .BindExchange("core-events-exchange") 
+                   .ToQueue("core-events-queue");       
+
             options.ListenToRabbitQueue("core-events-queue");
             options.Policies.AutoApplyTransactions();
-
-            options.Discovery.IncludeAssembly(assembly);
         });
     }
 }

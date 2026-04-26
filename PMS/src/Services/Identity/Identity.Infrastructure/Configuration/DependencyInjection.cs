@@ -99,7 +99,7 @@ public static class DependencyInjection
             options.UseRabbitMq(new Uri(rabbitUri)).AutoProvision();
 
             options.PublishMessage<UserRegisteredEvent>()
-                   .ToRabbitQueue("core-events-queue"); 
+                .ToRabbitExchange("core-events-exchange");
 
             options.Policies.AutoApplyTransactions();
         });

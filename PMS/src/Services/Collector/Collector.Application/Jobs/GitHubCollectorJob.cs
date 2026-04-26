@@ -33,8 +33,7 @@ public class GitHubCollectorJob
     {
         _logger.LogInformation("Starting GitHub synchronization job via Hangfire...");
 
-        // Берем коммиты за последний час
-        var since = DateTimeOffset.UtcNow.AddHours(-1);
+        var since = DateTimeOffset.UtcNow.AddDays(-7);
         var recentCommits = await _gitProvider.FetchRecentCommitsAsync(since, cancellationToken);
 
         int newActivitiesCount = 0;
