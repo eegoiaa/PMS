@@ -69,5 +69,5 @@ public class GitHubCollectorJob
 
         _logger.LogInformation($"Job completed. Found {recentCommits.Count()} commits, processed {newActivitiesCount} valid tasks.");
     }
-    //fsfs
+    //fsfsfdf
 }
