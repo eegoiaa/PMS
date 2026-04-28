@@ -51,7 +51,7 @@ public class GitHubCollectorJob
 
             if (taskKey != null)
             {
-                var eventMsg = new ActivityLoggedEvent(taskKey, commit.AuthorEmail, 15.0);
+                var eventMsg = new ActivityLoggedEvent(taskKey, commit.AuthorEmail, 0);
                 await _messageBus.PublishAsync(eventMsg);
 
                 commit.IsProcessed = true;
