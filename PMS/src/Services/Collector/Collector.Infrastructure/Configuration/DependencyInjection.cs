@@ -37,6 +37,7 @@ public static class DependencyInjection
         services.AddScoped<ICollectorDbContext>(provider => provider.GetRequiredService<CollectorDbContext>());
 
         services.Configure<GitHubSettings>(configuration.GetSection(GitHubSettings.SectionName));
+        services.Configure<WakaSettings>(configuration.GetSection(WakaSettings.SectionName));
 
         services.AddScoped<IGitProvider, GitHubProvider>();
         services.AddScoped<IActivityCleaner, ActivityCleaner>();
