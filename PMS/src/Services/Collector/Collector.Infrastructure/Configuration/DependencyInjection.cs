@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PMS.Shared.Common.Events;
+using Refit;
+using System.Net.Http.Headers;
 using System.Reflection;
 using Wolverine;
 using Wolverine.RabbitMQ;
@@ -37,7 +39,7 @@ public static class DependencyInjection
         services.AddScoped<ICollectorDbContext>(provider => provider.GetRequiredService<CollectorDbContext>());
 
         services.Configure<GitHubSettings>(configuration.GetSection(GitHubSettings.SectionName));
-        services.Configure<WakaSettings>(configuration.GetSection(WakaSettings.SectionName));
+        services.Configure<WakaTimeSettings>(configuration.GetSection(WakaTimeSettings.SectionName));
 
         services.AddScoped<IGitProvider, GitHubProvider>();
         services.AddScoped<IActivityCleaner, ActivityCleaner>();
@@ -52,6 +54,17 @@ public static class DependencyInjection
                   }));
 
         services.AddHangfireServer();
+
+        services.AddRefitClient<IWakaTimeProvider>()
+            .ConfigureHttpClient((provider, client) =>
+            {
+                var settings = configuration.GetSection(WakaTimeSettings.SectionName).Get<WakaTimeSettings>();
+
+                client.BaseAddress = new Uri(settings!.BaseUrl);
+
+                var authString = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{settings.ApiKey}:"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authString);
+            });
 
         return services;
     }

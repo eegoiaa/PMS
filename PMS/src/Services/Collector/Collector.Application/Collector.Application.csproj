@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.24" />
+		<PackageReference Include="Refit" Version="10.1.6" />
 		<PackageReference Include="WolverineFx" Version="3.13.5" />
 	</ItemGroup>
 	

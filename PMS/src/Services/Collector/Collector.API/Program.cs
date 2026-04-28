@@ -29,12 +29,18 @@ app.MapControllers();
 
 app.UseHangfireDashboard();
 
-// 4. Регистрируем фоновую задачу (Job)
+// Регистрируем фоновую задачу (Job)
 // Hangfire сам инжектит все зависимости (GitProvider, DbContext) при вызове метода
 RecurringJob.AddOrUpdate<GitHubCollectorJob>(
     "github-sync-job",
     job => job.SyncCommitsAsync(CancellationToken.None), 
     "*/5 * * * *" // CRON выражение: запускать каждые 5 минут
+);
+
+RecurringJob.AddOrUpdate<WakaTimeCollectorJob>(
+    "wakatime-daily-sync",
+    job => job.SyncDailyTimeAsync(CancellationToken.None),
+    "55 23 * * *" // CRON: Запускать каждый день в 23:55
 );
 
 app.Run();
