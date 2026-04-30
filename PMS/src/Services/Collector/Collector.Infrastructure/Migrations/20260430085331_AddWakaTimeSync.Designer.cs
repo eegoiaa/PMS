@@ -3,6 +3,7 @@ using System;
 using Collector.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Collector.Infrastructure.Migrations
 {
     [DbContext(typeof(CollectorDbContext))]
-    partial class CollectorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430085331_AddWakaTimeSync")]
+    partial class AddWakaTimeSync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
