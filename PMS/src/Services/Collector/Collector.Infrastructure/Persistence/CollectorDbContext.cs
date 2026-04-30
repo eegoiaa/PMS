@@ -9,6 +9,7 @@ public class CollectorDbContext : DbContext, ICollectorDbContext
     public CollectorDbContext(DbContextOptions<CollectorDbContext> options) : base(options) { }
 
     public DbSet<RawActivityLog> RawActivityLogs { get; set; }
+    public DbSet<WakaTimeSync> WakaTimeSyncs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

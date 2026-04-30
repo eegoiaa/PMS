@@ -19,9 +19,15 @@ public static class ActivityLoggedConsumer
 
         var task = await dbContext.Tasks.FirstOrDefaultAsync(t => t.TaskKey == message.TaskKey, cancellationToken);
 
-        if(task == null)
+        if (task == null)
         {
             logger.LogWarning("Task with key {TaskKey} not found. Ignoring activity.", message.TaskKey);
+            return;
+        }
+
+        if (task.IsCompleted)
+        {
+            logger.LogWarning($"Rejected time update for task {task.TaskKey}: Task is already completed.");
             return;
         }
 

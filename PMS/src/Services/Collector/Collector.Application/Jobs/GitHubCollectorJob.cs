@@ -28,7 +28,6 @@ public class GitHubCollectorJob
         _logger = logger;
     }
 
-    // Это метод, который будет дергать Hangfire
     public async Task SyncCommitsAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Starting GitHub synchronization job via Hangfire...");
