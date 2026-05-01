@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Box, Button, Card, CardContent, TextField, Typography, Alert } from '@mui/material';
+import { Box, Button, Card, CardContent, TextField, Typography, Alert, Link as MuiLink } from '@mui/material';
 import { axiosClient } from '../api/axiosClient';
 
 const loginSchema = z.object({
@@ -32,7 +32,6 @@ export default function Login() {
         email: data.email,
         password: data.password
       });
-      
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
@@ -64,9 +63,9 @@ export default function Login() {
               label="Email"
               variant="outlined"
               sx={{ mb: 3 }}
-              {...register('email')} 
+              {...register('email')}
               error={!!errors.email}
-              helperText={errors.email?.message} 
+              helperText={errors.email?.message}
             />
 
             <TextField
@@ -86,10 +85,18 @@ export default function Login() {
               color="primary" 
               fullWidth 
               size="large"
-              disabled={isSubmitting} 
+              disabled={isSubmitting}
             >
               {isSubmitting ? 'Вход...' : 'Войти'}
             </Button>
+
+            <Typography sx={{ mt: 3, textAlign: 'center', color: 'text.secondary' }}>
+              Нет аккаунта?{' '}
+              <MuiLink component={Link} to="/register" color="primary">
+                Зарегистрироваться
+              </MuiLink>
+            </Typography>
+
           </form>
         </CardContent>
       </Card>
