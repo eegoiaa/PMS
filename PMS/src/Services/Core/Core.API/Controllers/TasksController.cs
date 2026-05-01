@@ -1,11 +1,16 @@
 ﻿using Core.Application.Commands.CompleteTask;
 using Core.Application.Commands.CreateTask;
 using Core.Application.Commands.UpdateTaskPlan;
+using Core.Application.DTOs;
+using Core.Application.Queries.GetMyTasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Wolverine;
 
 namespace Core.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TasksController : ControllerBase
@@ -37,5 +42,20 @@ public class TasksController : ControllerBase
         await _messageBus.InvokeAsync(new UpdateTaskPlanCommand(taskId, request.NewPlanHours));
 
         return Ok(new { Message = "Task plan updated successfully." });
+    }
+
+    [HttpGet("my")]
+    public async Task<IActionResult> GetMyTasks([FromServices] IMessageBus messageBus)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier) ?? User.FindFirst("sub");
+
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var developerId))
+        {
+            return Unauthorized(new { message = "Не удалось извлечь ID пользователя из токена." });
+        }
+
+        var tasks = await messageBus.InvokeAsync<IEnumerable<TaskDto>>(new GetMyTasksQuery(developerId));
+
+        return Ok(tasks);
     }
 }

@@ -11,6 +11,7 @@ public static class ActivityLoggedConsumer
         ActivityLoggedEvent message,
         ICoreDbContext dbContext,
         ILogger logger,
+        ITaskNotifier notifier,
         CancellationToken cancellationToken
         )
     {
@@ -34,6 +35,8 @@ public static class ActivityLoggedConsumer
         task.FactHours += message.SpentHours;
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await notifier.NotifyTaskUpdatedAsync(task.Id, task.FactHours, cancellationToken);
 
         logger.LogInformation("Task {TaskKey} updated successfully. New FactHours: {FactHours}",
             task.TaskKey, task.FactHours);
