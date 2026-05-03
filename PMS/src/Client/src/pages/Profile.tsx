@@ -3,46 +3,20 @@ import { Box, Typography, Button, Container, Card, CardContent } from '@mui/mate
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { jwtDecode } from 'jwt-decode';
 import { tasksApi } from '../api/tasksApi';
 import { analyticsApi } from '../api/analyticsApi';
 
 export default function Profile() {
   const navigate = useNavigate();
-  // Убрали дефолтные значения, чтобы видеть реальную картину
   const [userEmail, setUserEmail] = useState<string>("Загрузка...");
   const [developerId, setDeveloperId] = useState<string | null>(null);
 
-  // ПРАВИЛЬНАЯ РАСШИФРОВКА ТОКЕНА ASP.NET
   useEffect(() => {
-    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      try {
-        const decoded: any = jwtDecode(token);
-        console.log("Расшифрованный токен (посмотри в консоли F12!):", decoded);
-        
-        // Динамически ищем ключ для Email
-        const emailKey = Object.keys(decoded).find(k => k.toLowerCase().includes('email'));
-        // Динамически ищем ключ для ID
-        const idKey = Object.keys(decoded).find(k => k.toLowerCase().includes('nameidentifier') || k.toLowerCase() === 'sub');
+    const savedEmail = localStorage.getItem('userEmail');
+    const savedId = localStorage.getItem('developerId');
 
-        if (emailKey && decoded[emailKey]) {
-          setUserEmail(decoded[emailKey]);
-        } else {
-          setUserEmail("Email не найден");
-        }
-
-        if (idKey && decoded[idKey]) {
-          setDeveloperId(decoded[idKey]);
-        } else {
-          console.error("Критическая ошибка: ID разработчика не найден в токене!");
-        }
-
-      } catch (e) {
-        console.error("Ошибка расшифровки токена", e);
-      }
-    }
+    if (savedEmail) setUserEmail(savedEmail);
+    if (savedId) setDeveloperId(savedId);
   }, []);
 
   const { data: tasks } = useQuery({
@@ -53,7 +27,7 @@ export default function Profile() {
   const { data: analytics } = useQuery({
     queryKey: ['analytics', developerId],
     queryFn: () => analyticsApi.getSummary(developerId!),
-    enabled: !!developerId, // Запрос улетит только когда мы точно знаем ID
+    enabled: !!developerId,
     retry: false 
   });
 
@@ -62,6 +36,13 @@ export default function Profile() {
     'План (ч)': task.planHours,
     'Факт (ч)': task.factHours
   })) || [];
+
+  const getHealthStatus = (volatility: number | undefined) => {
+    if (volatility === undefined) return 'Неизвестно';
+    if (volatility > 0.5) return 'Перегруз ⚠️'; 
+    if (volatility < -0.5) return 'Слишком быстро ⚡'; 
+    return 'В норме 🟢'; 
+  };
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pt: 4, pb: 10 }}>
@@ -77,7 +58,7 @@ export default function Profile() {
             &larr; Назад
           </Button>
           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-            Аналитика разработчика <span style={{ color: '#FFD700' }}>.</span>
+            Аналитика разработчика <span style={{ color: '#FFD700' }}></span>
           </Typography>
         </Box>
 
@@ -87,36 +68,43 @@ export default function Profile() {
           gap: 4, 
           mb: 6 
         }}>
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 4, height: '100%' }}>
-            <CardContent sx={{ p: 4 }}>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>Пользователь</Typography>
+          
+          <Card sx={{ bgcolor: 'background.paper', borderRadius: 4 }}>
+            <CardContent sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>Разработчик</Typography>
               <Typography variant="h6" sx={{ fontWeight: 'bold', wordBreak: 'break-all' }}>
-                {userEmail}
+                {analytics?.fullName || userEmail}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Активных задач: {analytics?.activeTasksCount || 0}
               </Typography>
             </CardContent>
           </Card>
           
-          {/* ИСПРАВЛЕНИЕ: Заменили borderTop на красивое свечение (boxShadow) */}
           <Card sx={{ 
             bgcolor: 'background.paper', 
             borderRadius: 4, 
-            height: '100%', 
             border: '1px solid rgba(255, 215, 0, 0.3)',
             boxShadow: '0 8px 32px rgba(255, 215, 0, 0.15)' 
           }}>
-            <CardContent sx={{ p: 4 }}>
+            <CardContent sx={{ p: 4, textAlign: 'center' }}>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>Индекс волатильности</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#FFD700' }}>
-                {analytics?.volatilityScore !== undefined ? analytics.volatilityScore.toFixed(2) : '--'}
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#FFD700' }}>
+                {analytics?.averageVolatility !== undefined 
+                  ? analytics.averageVolatility.toFixed(3) 
+                  : '--'}
               </Typography>
             </CardContent>
           </Card>
 
-          <Card sx={{ bgcolor: 'background.paper', borderRadius: 4, height: '100%' }}>
-            <CardContent sx={{ p: 4 }}>
+          <Card sx={{ bgcolor: 'background.paper', borderRadius: 4 }}>
+            <CardContent sx={{ p: 4, textAlign: 'center' }}>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>Статус (Health)</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
-                {analytics?.health || 'Неизвестно'}
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                {getHealthStatus(analytics?.averageVolatility)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Прогноз нагрузки: {analytics?.totalPredictedLoad?.toFixed(1) || 0} ч.
               </Typography>
             </CardContent>
           </Card>
@@ -128,7 +116,7 @@ export default function Profile() {
           </Typography>
           <Box sx={{ height: 400, width: '100%' }}>
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="99%" height="100%">
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                   <XAxis dataKey="name" stroke="#8884d8" />

@@ -1,24 +1,79 @@
-import { Box, Button, Container, Typography, Card, CardContent, Stack } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { 
+  Box, Typography, Button, Container, Stack, Avatar, Card, CardContent 
+} from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { Speed, AutoGraph, ElectricBolt } from '@mui/icons-material';
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  // Проверяем наличие пользователя в системе при загрузке страницы
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail) {
+      setUserEmail(savedEmail);
+    }
+  }, []);
+
+  const getEmailInitial = (email: string) => email.charAt(0).toUpperCase();
+
+  // Функция для выхода из системы
+  const handleLogout = () => {
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('developerId');
+    setUserEmail(null);
+    navigate('/');
+  };
+
   return (
     <Box sx={{ bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh' }}>
       
-      {/* --- NAVBAR --- */}
+      {/* --- NAVBAR (УМНЫЙ) --- */}
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
             PMS<span style={{ color: '#FFD700' }}>.</span>PORTAL
           </Typography>
-          <Stack direction="row" spacing={2}>
-            <Button component={Link} to="/login" color="inherit" sx={{ fontWeight: 600 }}>
-              Войти
-            </Button>
-            <Button component={Link} to="/register" variant="contained" color="primary">
-              Начать работу
-            </Button>
+          
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+            {userEmail ? (
+              /* Контент для авторизованного пользователя */
+              <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mr: 1 }}>
+                  <Avatar sx={{ 
+                    bgcolor: 'primary.main', 
+                    width: 32, 
+                    height: 32, 
+                    fontSize: '0.8rem', 
+                    fontWeight: 'bold',
+                    color: 'background.default'
+                  }}>
+                    {getEmailInitial(userEmail)}
+                  </Avatar>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', display: { xs: 'none', sm: 'block' } }}>
+                    {userEmail}
+                  </Typography>
+                </Box>
+                <Button component={Link} to="/dashboard" variant="contained" color="primary" size="small">
+                  В дашборд
+                </Button>
+                <Button onClick={handleLogout} variant="text" color="inherit" sx={{ opacity: 0.7, fontSize: '0.8rem' }}>
+                  Выйти
+                </Button>
+              </>
+            ) : (
+              /* Контент для гостя */
+              <>
+                <Button component={Link} to="/login" color="inherit" sx={{ fontWeight: 600 }}>
+                  Войти
+                </Button>
+                <Button component={Link} to="/register" variant="contained" color="primary">
+                  Начать работу
+                </Button>
+              </>
+            )}
           </Stack>
         </Box>
       </Container>
@@ -27,7 +82,6 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ mt: { xs: 8, md: 15 }, mb: 10 }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: 4 }}>
           
-          {/* Левая колонка */}
           <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 58%' } }}>
             <Typography variant="h1" sx={{ 
               fontSize: { xs: '2.5rem', md: '4rem' }, 
@@ -44,13 +98,13 @@ export default function Home() {
             <Stack direction="row" spacing={2}>
               <Button 
                 component={Link} 
-                to="/register" 
+                to={userEmail ? "/dashboard" : "/register"} 
                 variant="contained" 
                 color="primary" 
                 size="large" 
                 sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
               >
-                Попробовать бесплатно
+                {userEmail ? "Перейти к задачам" : "Попробовать бесплатно"}
               </Button>
               <Button 
                 variant="outlined" 
@@ -63,14 +117,12 @@ export default function Home() {
             </Stack>
           </Box>
           
-          {/* Декоративный элемент / Абстракция (Правая колонка) */}
           <Box sx={{ 
             flex: { xs: '1 1 100%', md: '0 0 41%' }, 
             display: { xs: 'none', md: 'flex' }, 
             justifyContent: 'center', 
             position: 'relative' 
           }}>
-            {/* Желтое свечение на фоне */}
             <Box sx={{
               position: 'absolute',
               width: '100%',
@@ -84,15 +136,14 @@ export default function Home() {
               zIndex: 0
             }} />
             
-            {/* Карточка с кодом */}
             <Box sx={{ 
-              py: 6, // Отступы сверху и снизу
+              py: 6, 
               px: 4, 
-              width: '100%', // Растягиваем карточку по ширине
+              width: '100%', 
               display: 'flex',
-              justifyContent: 'center', // Центрируем блок кода внутри карточки
+              justifyContent: 'center', 
               border: '1px solid rgba(255,255,255,0.1)', 
-              borderRadius: '32px', // Фиксированное красивое скругление (вместо овала)
+              borderRadius: '32px', 
               bgcolor: 'background.paper',
               boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
               zIndex: 1

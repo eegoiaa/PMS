@@ -64,7 +64,11 @@ public class AuthController : ControllerBase
         };
         Response.Cookies.Append("refresh_token", result.RefreshToken.Token, refreshCookieOptions);
 
-        return Ok(new { Message = "You've signed in successfully" });
+        return Ok(new
+        {
+            Message = "You've signed in successfully",
+            userId = result.UserId
+        });
     }
 
 

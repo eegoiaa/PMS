@@ -40,6 +40,6 @@ public static class RefreshHandler
         if (!updateResult.Succeeded)
             throw new IdentityException(updateResult.Errors);
 
-        return new SignInResult(newAccessToken, newRefreshToken);
+        return new SignInResult(newAccessToken, newRefreshToken, user.Id);
     }
 }

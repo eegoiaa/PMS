@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { jwtDecode } from "jwt-decode";
 import { tasksApi } from "../api/tasksApi";
 import { useTaskSignalR } from '../hooks/useTaskSignalR';
 import type { TaskDto } from "../types";
@@ -32,17 +31,9 @@ export default function Dashboard() {
 
   // Извлекаем email из JWT токена в куках
   useEffect(() => {
-    const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-    if (tokenCookie) {
-      const token = tokenCookie.split('=')[1];
-      try {
-        const decoded: any = jwtDecode(token);
-        if (decoded.email) {
-          setUserEmail(decoded.email);
-        }
-      } catch (e) {
-        console.error("Ошибка декодирования токена:", e);
-      }
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail) {
+      setUserEmail(savedEmail);
     }
   }, []);
 
@@ -65,6 +56,15 @@ export default function Dashboard() {
     }
   });
 
+  // Мутация для завершения задачи
+  const completeTaskMutation = useMutation({
+    mutationFn: tasksApi.completeTask,
+    onSuccess: () => {
+      // Обновляем список задач, чтобы чип мгновенно стал зеленым
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    }
+  });
+
   // Настройка формы
   const { register, handleSubmit, reset, formState: { errors } } = useForm<TaskFormInputs>({
     resolver: zodResolver(taskSchema),
@@ -80,7 +80,19 @@ export default function Dashboard() {
 
   return (
     <Box sx={{ p: 4, maxWidth: 1200, margin: '0 auto' }}>
-      
+      <Button 
+          onClick={() => navigate('/')} 
+          sx={{ 
+            position: 'absolute', 
+            top: 24, 
+            left: 24, 
+            color: 'text.secondary',
+            textTransform: 'none',
+            fontSize: '1rem'
+          }}
+        >
+          &larr; На главную
+        </Button>
       {/* --- HEADER --- */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
@@ -115,7 +127,6 @@ export default function Dashboard() {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={() => setAnchorEl(null)}
-            // ИСПРАВЛЕНИЕ 2: Используем slotProps вместо PaperProps
             slotProps={{
               paper: { sx: { mt: 1, minWidth: 180, borderRadius: 2 } }
             }}
@@ -141,16 +152,37 @@ export default function Dashboard() {
           return (
             <Card key={task.id} sx={{ height: '100%' }}>
               <CardContent sx={{ pt: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                
+                {/* --- ВОТ ЗДЕСЬ ДОБАВЛЕНА КНОПКА ЗАВЕРШЕНИЯ --- */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
                     {task.taskKey}
                   </Typography>
-                  <Chip 
-                    label={task.isCompleted ? "Завершена" : "В работе"} 
-                    size="small" 
-                    color={task.isCompleted ? "success" : "warning"}
-                  />
+                  
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    <Chip 
+                      label={task.isCompleted ? "Завершена" : "В работе"} 
+                      size="small" 
+                      color={task.isCompleted ? "success" : "warning"}
+                    />
+                    
+                    {/* Кнопка показывается ТОЛЬКО если задача еще не завершена */}
+                    {!task.isCompleted && (
+                      <Button 
+                        size="small" 
+                        variant="contained" 
+                        color="success"
+                        sx={{ fontSize: '0.7rem', minWidth: 'auto', px: 1.5, py: 0.3 }}
+                        onClick={() => completeTaskMutation.mutate(task.id)}
+                        disabled={completeTaskMutation.isPending}
+                      >
+                        ✔
+                      </Button>
+                    )}
+                  </Stack>
                 </Box>
+                {/* ------------------------------------------------ */}
+
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, minHeight: '60px' }}>
                   {task.title}
                 </Typography>

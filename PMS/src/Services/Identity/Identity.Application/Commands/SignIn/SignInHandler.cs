@@ -29,6 +29,6 @@ public static class SignInHandler
         user.RefreshTokenExpiryTime = refreshToken.ExpiryTime;
 
         await userManager.UpdateAsync(user);
-        return new SignInResult(accessToken, refreshToken);
+        return new SignInResult(accessToken, refreshToken, user.Id);
     }
 }

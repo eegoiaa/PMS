@@ -28,10 +28,17 @@ export default function Login() {
   const onSubmit = async (data: LoginFormInputs) => {
     setServerError(null);
     try {
-      await axiosClient.post('/auth/login', {
+      const response = await axiosClient.post('/auth/login', {
         email: data.email,
         password: data.password
       });
+
+      localStorage.setItem('userEmail', data.email);
+      
+      if (response.data?.userId) {
+        localStorage.setItem('developerId', response.data.userId);
+      }
+
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
@@ -45,6 +52,19 @@ export default function Login() {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3 }}>
+      <Button 
+          onClick={() => navigate('/')} 
+          sx={{ 
+            position: 'absolute', 
+            top: 24, 
+            left: 24, 
+            color: 'text.secondary',
+            textTransform: 'none',
+            fontSize: '1rem'
+          }}
+        >
+          &larr; На главную
+        </Button>
       <Card sx={{ maxWidth: 400, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', mb: 3 }}>

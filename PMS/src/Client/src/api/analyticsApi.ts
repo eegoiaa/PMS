@@ -1,8 +1,10 @@
 import { axiosClient } from "./axiosClient";
 
 export interface AnalyticsSummary {
-  volatilityScore: number;
-  health: string;
+  fullName: string;
+  averageVolatility: number;
+  totalPredictedLoad: number;
+  activeTasksCount: number;
 }
 
 export const analyticsApi = {
