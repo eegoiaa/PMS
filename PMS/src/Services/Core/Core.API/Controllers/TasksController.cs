@@ -23,10 +23,20 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateTask([FromBody] CreateTaskCommand command)
+    public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequest request)
     {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var developerId))
+            return Unauthorized();
+
+        var command = new CreateTaskCommand(
+            developerId,
+            request.Title,
+            request.PlanHours
+        );
+
         var taskId = await _messageBus.InvokeAsync<Guid>(command);
-        return Ok(new { TaskId = taskId, Message = "Task create ssuccesfully" });
+        return Ok(new { TaskId = taskId, Message = "Task created successfully" });
     }
 
     [HttpPost("{taskId:guid}/complete")]

@@ -1,9 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home'; 
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register'; 
 import Dashboard from './pages/Dashboard';
 import ConfirmEmail from './pages/ConfirmEmail';
+import Profile from './pages/Profile'; 
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
         <Route path="/register" element={<Register />} /> 
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} /> 
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

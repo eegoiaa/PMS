@@ -1,5 +1,6 @@
 ﻿using Core.Application.Interfaces;
 using Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using PMS.Shared.Common.Exceptions;
 
 namespace Core.Application.Commands.CreateTask;
@@ -15,10 +16,15 @@ public static class CreateTaskHandler
         if (!developerExists)
             throw new NotFoundException($"Developer with ID {command.DeveloperId} was not found.");
 
+        var tasksCount = await dbContext.Tasks
+            .CountAsync(t => t.DeveloperId == command.DeveloperId, cancellationToken);
+
+        var generatedTaskKey = $"TASK-{tasksCount + 1}";
+
         var task = new ProjectTask
         {
             Id = Guid.NewGuid(),
-            TaskKey = command.TaskKey.ToUpper(),
+            TaskKey = generatedTaskKey,
             Title = command.Title,
             DeveloperId = command.DeveloperId,
             PlanHours = command.PlanHours,
